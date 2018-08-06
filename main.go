@@ -1,10 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"github.com/spf13/viper"
+)
 
 type Context struct {
 }
 
 func main() {
-	fmt.Println("Hello World")
+	viper.SetConfigName("loom")
+	viper.AddConfigPath("/etc/")
 }
