@@ -1,0 +1,4 @@
+vendor/*
+stats
+dist/*
+cover.out

@@ -1,0 +1,11 @@
+{
+  "name": "cheddar-stats",
+  "environments": {
+    "test": {
+      "scripts": {
+        "test-setup": "./scripts/ci_setup.sh",
+        "test": "./scripts/ci_test.sh"
+      }
+    }
+  }
+}
