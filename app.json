@@ -1,5 +1,5 @@
 {
-  "name": "cheddar-stats",
+  "name": "cheddar-loom",
   "environments": {
     "test": {
       "scripts": {

@@ -1,4 +1,4 @@
 vendor/*
 loom
 dist/*
-cover.out
+*.out
