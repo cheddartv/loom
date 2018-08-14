@@ -6,24 +6,17 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.10.3
-
     working_directory: /go/src/github.com/cheddartv/loom
     steps:
       - checkout
-      - run:
-        name: Setup Dependencies
-        comand: |
+      - run: |
           sudo composer self-update
           composer install -n --prefer-dist
-      - run:
-        name: Setup CodeClimate test-reporter
-        command: |
+      - run: |
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
       - run: dep ensure
-      - run:
-        name: Run tests
-        command: |
+      - run: |
           ./cc-test-reporter before-build
           go test -coverprofile=c.out -v ./...
           ./cc-test-reporter after-build --coverage-input-type gocov --exit-code $?
