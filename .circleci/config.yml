@@ -1,0 +1,19 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10.3
+    working_directory: /go/src/github.com/cheddartv/loom
+    steps:
+      - checkout
+      - run: dep ensure
+      - run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+      - run: |
+          ./cc-test-reporter before-build
+          go test -coverprofile=c.out -v ./...
+          ./cc-test-reporter after-build --coverage-input-type gocov --exit-code $?

@@ -1,4 +1,4 @@
 vendor/*
-stats
+loom
 dist/*
-cover.out
+*.out

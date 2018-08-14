@@ -1,10 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/cheddartv/loom/config"
+)
 
 type Context struct {
+	Config *config.Config
 }
 
 func main() {
-	fmt.Println("Hello World")
+	var context Context
+	context.Config = config.Load()
+	fmt.Printf("Got an output: %v\n", context.Config)
 }
