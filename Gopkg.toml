@@ -17,8 +17,3 @@
 [prune]
   go-tests = true
   unused-packages = true
-
-[metadata.heroku]
-  root-package = "github.com/cheddartv/loom"
-  go-version = "go1.10.3"
-  install = "./..."
