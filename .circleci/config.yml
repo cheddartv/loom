@@ -9,13 +9,10 @@ jobs:
     working_directory: /go/src/github.com/cheddartv/loom
     steps:
       - checkout
-      - run: |
-          sudo composer self-update
-          composer install -n --prefer-dist
+      - run: dep ensure
       - run: |
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
-      - run: dep ensure
       - run: |
           ./cc-test-reporter before-build
           go test -coverprofile=c.out -v ./...
