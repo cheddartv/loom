@@ -115,6 +115,14 @@
   version = "v1.2.0"
 
 [[projects]]
+  digest = "1:ba51b2c7d37f3741fcf6319ea843e88ee6a032412858de0d89a229f1725b279d"
+  name = "github.com/rjeczalik/notify"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "52ae50d8490436622a8941bd70c3dbe0acdd4bbf"
+  version = "v0.9.0"
+
+[[projects]]
   digest = "1:bd1ae00087d17c5a748660b8e89e1043e1e5479d0fea743352cda2f8dd8c4f84"
   name = "github.com/spf13/afero"
   packages = [
@@ -235,6 +243,7 @@
   input-imports = [
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
+    "github.com/rjeczalik/notify",
     "github.com/spf13/viper",
   ]
   solver-name = "gps-cdcl"

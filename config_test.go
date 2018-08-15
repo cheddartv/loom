@@ -1,16 +1,17 @@
-package config_test
+package main_test
 
 import (
-	"github.com/cheddartv/loom/config"
+	main "github.com/cheddartv/loom"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("loading configuration file", func() {
-	var c *config.Config
+	var c *main.Config
 
 	BeforeEach(func() {
-		c = config.Load()
+		c = main.Load()
 	})
 
 	It("creates the correct number of manifests", func() {
@@ -18,10 +19,10 @@ var _ = Describe("loading configuration file", func() {
 	})
 
 	It("configures the correct output", func() {
-		Expect(c.Manifests[0].Output).To(Equal("a.m3u8"))
+		Expect(c.Manifests[0].Output).To(Equal("example/index.m3u8"))
 	})
 
 	It("configures the correct inputs", func() {
-		Expect(c.Manifests[0].Inputs).To(Equal([]string{"a/primary.m3u8", "a/backup.m3u8"}))
+		Expect(c.Manifests[0].Inputs).To(Equal([]string{"example/primary.m3u8", "example/backup.m3u8"}))
 	})
 })

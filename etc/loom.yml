@@ -1,9 +1,9 @@
 manifests:
-  - output: a.m3u8
+  - output: example/index.m3u8
     inputs:
-      - a/primary.m3u8
-      - a/backup.m3u8
-  - output: b.m3u8
+      - example/primary.m3u8
+      - example/backup.m3u8
+  - output: example/index2.m3u8
     inputs:
-      - b/primary.m3u8
-      - b/backup.m3u8
+      - example/primary2.m3u8
+      - example/backup2.m3u8
