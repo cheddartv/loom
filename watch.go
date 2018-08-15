@@ -18,14 +18,11 @@ type Change struct {
 }
 
 func CleanPath(dirty string) string {
-	a, err := filepath.Abs(dirty)
-	if err != nil {
-		log.Fatal("Unable to generate absolute path from ", dirty)
-	}
+	a, _ := filepath.Abs(dirty)
 
 	d, err := filepath.EvalSymlinks(path.Dir(a))
 	if err != nil {
-		log.Fatal("Unable to evaluate symlinks on ", path.Dir(a))
+		panic("Unable to evaluate symlinks on " + path.Dir(a))
 	}
 	return path.Join(d, path.Base(a))
 }
