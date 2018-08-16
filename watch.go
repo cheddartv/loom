@@ -38,7 +38,6 @@ func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
 	}
 	p, listType, err := m3u8.DecodeFrom(bufio.NewReader(f), true)
 	if err != nil {
-		log.Print(err)
 		return nil, err
 	}
 	if listType != m3u8.MASTER {
@@ -49,7 +48,6 @@ func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
 		log.Printf("%+v\n", masterpl)
 		return masterpl, nil
 	}
-	return nil, errors.New("why are we here???")
 }
 
 func ImportInputs(dirtyPaths []string) ([]string, map[string]*m3u8.MasterPlaylist) {
