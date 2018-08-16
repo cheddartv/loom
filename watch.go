@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"log"
+	"os"
 	"path"
 	"path/filepath"
 
+	"github.com/grafov/m3u8"
 	"github.com/rjeczalik/notify"
 )
 
@@ -13,29 +17,61 @@ type Change struct {
 	Remove bool
 }
 
-func CleanPaths(dirty []string) []string {
-	cleaned := make([]string, len(dirty))
-	for i, p := range dirty {
-		a, err := filepath.Abs(p)
-		if err != nil {
-			log.Fatal("Unable to generate absolute path from ", p)
-		}
-
-		d, err := filepath.EvalSymlinks(path.Dir(a))
-		if err != nil {
-			log.Fatal("Unable to evaluate symlinks on ", path.Dir(a))
-		}
-
-		cleaned[i] = path.Join(d, path.Base(a))
+func CleanPath(dirty string) string {
+	a, err := filepath.Abs(dirty)
+	if err != nil {
+		log.Fatal("Unable to generate absolute path from ", dirty)
 	}
 
-	return cleaned
+	d, err := filepath.EvalSymlinks(path.Dir(a))
+	if err != nil {
+		log.Fatal("Unable to evaluate symlinks on ", path.Dir(a))
+	}
+	return path.Join(d, path.Base(a))
+}
+
+func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		log.Printf("Provided file %s errored and was skipped", file)
+		return nil, err
+	}
+	p, listType, err := m3u8.DecodeFrom(bufio.NewReader(f), true)
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+	if listType != m3u8.MASTER {
+		log.Print("m3u8 was not a master playlist, can not weave")
+		return nil, errors.New("Incorrect playlist format")
+	} else {
+		masterpl := p.(*m3u8.MasterPlaylist)
+		log.Printf("%+v\n", masterpl)
+		return masterpl, nil
+	}
+	return nil, errors.New("why are we here???")
+}
+
+func ImportInputs(dirtyPaths []string) ([]string, map[string]*m3u8.MasterPlaylist) {
+	inputStructs := make(map[string]*m3u8.MasterPlaylist)
+	cleanPaths := make([]string, len(dirtyPaths))
+	for _, file := range dirtyPaths {
+		cleanfile := CleanPath(file)
+		cleanPaths = append(cleanPaths, cleanfile)
+		mp, err := ImportPlaylist(cleanfile)
+		if err != nil {
+			log.Print(err)
+		} else {
+			inputStructs[file] = mp
+		}
+	}
+	return cleanPaths, inputStructs
 }
 
 func CreateWatcher(paths []string) <-chan Change {
 	in := make(chan notify.EventInfo, 10)
 	out := make(chan Change)
-	paths = CleanPaths(paths)
+	paths, _ = ImportInputs(paths)
 
 	go func() {
 		for _, p := range paths {
