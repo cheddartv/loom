@@ -42,7 +42,6 @@ func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
 		return nil, errors.New("Incorrect playlist format")
 	} else {
 		masterpl := p.(*m3u8.MasterPlaylist)
-		log.Printf("%+v\n", masterpl)
 		return masterpl, nil
 	}
 }
@@ -50,9 +49,9 @@ func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
 func ImportInputs(dirtyPaths []string) ([]string, map[string]*m3u8.MasterPlaylist) {
 	inputStructs := make(map[string]*m3u8.MasterPlaylist)
 	cleanPaths := make([]string, len(dirtyPaths))
-	for _, file := range dirtyPaths {
+	for i, file := range dirtyPaths {
 		cleanfile := CleanPath(file)
-		cleanPaths = append(cleanPaths, cleanfile)
+		cleanPaths[i] = cleanfile
 		mp, err := ImportPlaylist(cleanfile)
 		if err != nil {
 			log.Print(err)
@@ -60,6 +59,7 @@ func ImportInputs(dirtyPaths []string) ([]string, map[string]*m3u8.MasterPlaylis
 			inputStructs[file] = mp
 		}
 	}
+
 	return cleanPaths, inputStructs
 }
 
