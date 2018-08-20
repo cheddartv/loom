@@ -37,68 +37,6 @@ var _ = Describe("generating clean paths", func() {
 	})
 })
 
-var _ = Describe("import playlist from file", func() {
-
-	It("return nil playlist and error when playlist doesn't exist", func() {
-		playlist, err := main.ImportPlaylist("playlist.m3u8")
-		Expect(playlist).To(BeNil())
-		Expect(err).Should(HaveOccurred())
-	})
-
-	It("return nil playlist and error when its not a playlist", func() {
-		playlist, err := main.ImportPlaylist("./watch_test.go")
-		Expect(playlist).To(BeNil())
-		Expect(err).Should(HaveOccurred())
-	})
-
-	It("return nil playlist and error, when its not a master playlist", func() {
-		playlist, err := main.ImportPlaylist("./example/1.m3u8")
-		Expect(playlist).To(BeNil())
-		Expect(err).Should(HaveOccurred())
-	})
-
-	It("returns a struct of the masterplaylist", func() {
-		playlist, err := main.ImportPlaylist("./example/primary.m3u8")
-		Expect(playlist.Variants[0].URI).To(Equal("primary/1.m3u8"))
-		Expect(err).ShouldNot(HaveOccurred())
-	})
-
-})
-
-var _ = Describe("importInputs playlists from paths", func() {
-	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
-
-	It("cleans the paths", func() {
-		paths := []string{"example/primary.m3u8", "example/backup.m3u8"}
-		c, _ := main.ImportInputs(paths)
-		Expect(c[0]).To(Equal(workingDir + "/" + paths[0]))
-		Expect(c[1]).To(Equal(workingDir + "/" + paths[1]))
-	})
-
-	It("ImportPlaylist gets a bad path, it doesn't add the file to the map", func() {
-		paths := []string{"example/primary_dne.m3u8"}
-		_, structs := main.ImportInputs(paths)
-		Expect(structs[0].Playlist).To(BeNil())
-	})
-
-})
-
-var _ = Describe("FindStructIndexByPath", func() {
-	input := []main.Change{
-		{Path: "primary.m3u8", AbsPath: "/root/primary.m3u8", Remove: false, Playlist: nil},
-		{Path: "primary2.m3u8", AbsPath: "/root/primary2.m3u8", Remove: false, Playlist: nil},
-	}
-
-	It("returns the index of the struct", func() {
-		Expect(main.FindStructIndexByPath("/root/primary.m3u8", input)).To(Equal(0))
-	})
-
-	It("returns -1 if the file is not present", func() {
-		Expect(main.FindStructIndexByPath("/not/present/primary.m3u8", input)).To(Equal(-1))
-	})
-
-})
-
 type mockEventInfo struct {
 	Type     notify.Event
 	BasePath string
@@ -117,38 +55,19 @@ func (e mockEventInfo) Sys() interface{} {
 	return nil
 }
 
-var _ = Describe("HandleEvent", func() {
-	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
-	input := []main.Change{
-		{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary.m3u8", Remove: false, Playlist: nil},
-		{Path: "backup.m3u8", AbsPath: workingDir + "/example/backup.m3u8", Remove: true, Playlist: nil},
-		{Path: "1.m3u8", AbsPath: workingDir + "/example/1.m3u8", Remove: false, Playlist: nil},
-	}
-
-	It("Updates the data struct on file creation", func() {
-		event := mockEventInfo{Type: notify.Create, BasePath: "/example/backup.m3u8"}
-
-		Expect(main.HandleEvent(event, input)[1].Remove).To(BeFalse())
+var _ = Describe("EventToString", func() {
+	It("returns Create for create", func() {
+		Expect(main.EventToString(notify.Create)).To(BeEquivalentTo("Create"))
 	})
-
-	It("Updates the data struct on file removal", func() {
-		event := mockEventInfo{Type: notify.Remove, BasePath: "/example/primary.m3u8"}
-
-		Expect(main.HandleEvent(event, input)[0].Remove).To(BeTrue())
+	It("returns Write for Write", func() {
+		Expect(main.EventToString(notify.Write)).To(BeEquivalentTo("Write"))
 	})
-
-	It("non-tracked files do not change data struct", func() {
-		event := mockEventInfo{Type: notify.Remove, BasePath: "/example/not_tracked.m3u8"}
-
-		Expect(main.HandleEvent(event, input)).Should(BeEquivalentTo(input))
+	It("returns Remove for remove", func() {
+		Expect(main.EventToString(notify.Remove)).To(BeEquivalentTo("Remove"))
 	})
-
-	It("Removes a playlist if an update makes it fail parsing", func() {
-		event := mockEventInfo{Type: notify.Write, BasePath: "/example/1.m3u8"}
-
-		Expect(main.HandleEvent(event, input)[2].Remove).To(BeTrue())
+	It("returns emptyString for the rest", func() {
+		Expect(main.EventToString(notify.Rename)).To(BeEquivalentTo(""))
 	})
-
 })
 
 var _ = Describe("CreateWatcher", func() {
@@ -156,7 +75,7 @@ var _ = Describe("CreateWatcher", func() {
 	out := main.CreateWatcher(paths)
 
 	It("Should write to out", func() {
-		Eventually(out).Should(Receive())
+		Eventually(out).Should(Receive(Equal(main.Change{"", "", "EndSetup"})))
 	})
 
 })

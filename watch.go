@@ -1,22 +1,17 @@
 package main
 
 import (
-	"bufio"
-	"errors"
 	"log"
-	"os"
 	"path"
 	"path/filepath"
 
-	"github.com/grafov/m3u8"
 	"github.com/rjeczalik/notify"
 )
 
 type Change struct {
-	Path     string
-	AbsPath  string
-	Remove   bool
-	Playlist *m3u8.MasterPlaylist
+	Path    string
+	AbsPath string
+	Type    string
 }
 
 func CleanPath(dirty string) string {
@@ -29,95 +24,41 @@ func CleanPath(dirty string) string {
 	return path.Join(d, path.Base(a))
 }
 
-func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
-	f, err := os.Open(file)
-	if err != nil {
-		log.Printf("Provided file %s errored and was skipped", file)
-		return nil, err
-	}
-	p, listType, err := m3u8.DecodeFrom(bufio.NewReader(f), true)
-	if err != nil {
-		log.Printf("parsing error\n")
-		return nil, err
-	}
-	if listType != m3u8.MASTER {
-		log.Print("m3u8 was not a master playlist, can not weave")
-		return nil, errors.New("Incorrect playlist format")
-	} else {
-		masterpl := p.(*m3u8.MasterPlaylist)
-		return masterpl, nil
+func EventToString(event notify.Event) string {
+	switch event {
+	case notify.Create:
+		return "Create"
+	case notify.Write:
+		return "Write"
+	case notify.Remove:
+		return "Remove"
+	default:
+		return ""
 	}
 }
 
-func ImportInputs(dirtyPaths []string) ([]string, []Change) {
-	inputStructs := make([]Change, len(dirtyPaths))
-	cleanPaths := make([]string, len(dirtyPaths))
-	for i, file := range dirtyPaths {
-		cleanfile := CleanPath(file)
-		cleanPaths[i] = cleanfile
-		mp, err := ImportPlaylist(cleanfile)
-		if err != nil {
-			log.Print("!!ERROR: ", err)
-			inputStructs[i] = Change{Path: file, AbsPath: cleanfile, Remove: true, Playlist: nil}
-		} else {
-			inputStructs[i] = Change{Path: file, AbsPath: cleanfile, Remove: false, Playlist: mp}
-		}
-	}
-
-	return cleanPaths, inputStructs
-}
-
-func FindStructIndexByPath(path string, cs []Change) int {
-	for i, c := range cs {
-		if c.AbsPath == path {
-			return i
-		}
-	}
-	return -1
-}
-
-func HandleEvent(event notify.EventInfo, cs []Change) []Change {
-	p := event.Path()
-	i := FindStructIndexByPath(p, cs)
-	if i < 0 {
-		return cs
-	} else {
-		if event.Event() == notify.Remove {
-			cs[i].Remove = true
-		} else {
-			mp, err := ImportPlaylist(p)
-			if err != nil {
-				log.Print("an update created an error with the playlist", err)
-				log.Print("removing the playlist from the viable set")
-				cs[i].Remove = true
-			} else {
-				cs[i].Remove = false
-				cs[i].Playlist = mp
-			}
-		}
-	}
-	return cs
-}
-
-func CreateWatcher(paths []string) <-chan []Change {
+func CreateWatcher(paths []string) <-chan Change {
 	in := make(chan notify.EventInfo, 10)
-	out := make(chan []Change)
-	paths, allData := ImportInputs(paths)
+	out := make(chan Change)
+	pathsMap := make(map[string]string)
 
 	go func() {
 		for _, p := range paths {
+			pathsMap[CleanPath(p)] = p
+			out <- Change{Path: p, AbsPath: CleanPath(p), Type: EventToString(notify.Create)}
 			d := path.Dir(p)
 			if err := notify.Watch(d+"/...", in, notify.Create, notify.Remove, notify.Write); err != nil {
 				log.Fatal(err)
 			}
 		}
+		out <- Change{Path: "", AbsPath: "", Type: "EndSetup"}
 		defer notify.Stop(in)
-		out <- allData
 		for {
 			ei := <-in
 			log.Println("Raw event: ", ei)
-			allData = HandleEvent(ei, allData)
-			out <- allData
+			if p, ok := pathsMap[ei.Path()]; ok {
+				out <- Change{Path: p, AbsPath: ei.Path(), Type: EventToString(ei.Event())}
+			}
 		}
 	}()
 
