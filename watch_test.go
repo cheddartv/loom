@@ -120,25 +120,25 @@ func (e mockEventInfo) Sys() interface{} {
 var _ = Describe("HandleEvent", func() {
 	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
 	input := []main.Change{
-		{Path: "primary.m3u8", AbsPath: workingDir + "/tmp/primary.m3u8", Remove: false, Playlist: nil},
-		{Path: "backup.m3u8", AbsPath: workingDir + "/tmp/backup.m3u8", Remove: true, Playlist: nil},
+		{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary.m3u8", Remove: false, Playlist: nil},
+		{Path: "backup.m3u8", AbsPath: workingDir + "/example/backup.m3u8", Remove: true, Playlist: nil},
 		{Path: "1.m3u8", AbsPath: workingDir + "/example/1.m3u8", Remove: false, Playlist: nil},
 	}
 
 	It("Updates the data struct on file creation", func() {
-		event := mockEventInfo{Type: notify.Create, BasePath: "/tmp/backup.m3u8"}
+		event := mockEventInfo{Type: notify.Create, BasePath: "/example/backup.m3u8"}
 
 		Expect(main.HandleEvent(event, input)[1].Remove).To(BeFalse())
 	})
 
 	It("Updates the data struct on file removal", func() {
-		event := mockEventInfo{Type: notify.Remove, BasePath: "/tmp/primary.m3u8"}
+		event := mockEventInfo{Type: notify.Remove, BasePath: "/example/primary.m3u8"}
 
 		Expect(main.HandleEvent(event, input)[0].Remove).To(BeTrue())
 	})
 
 	It("non-tracked files do not change data struct", func() {
-		event := mockEventInfo{Type: notify.Remove, BasePath: "/tmp/not_tracked.m3u8"}
+		event := mockEventInfo{Type: notify.Remove, BasePath: "/example/not_tracked.m3u8"}
 
 		Expect(main.HandleEvent(event, input)).Should(BeEquivalentTo(input))
 	})
