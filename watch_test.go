@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	main "github.com/cheddartv/loom"
+	"github.com/rjeczalik/notify"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -76,8 +77,86 @@ var _ = Describe("importInputs playlists from paths", func() {
 
 	It("ImportPlaylist gets a bad path, it doesn't add the file to the map", func() {
 		paths := []string{"example/primary_dne.m3u8"}
-		_, structMap := main.ImportInputs(paths)
-		Expect(structMap[paths[0]]).To(BeNil())
+		_, structs := main.ImportInputs(paths)
+		Expect(structs[0].Playlist).To(BeNil())
+	})
+
+})
+
+var _ = Describe("FindStructIndexByPath", func() {
+	input := []main.Change{
+		{Path: "primary.m3u8", AbsPath: "/root/primary.m3u8", Remove: false, Playlist: nil},
+		{Path: "primary2.m3u8", AbsPath: "/root/primary2.m3u8", Remove: false, Playlist: nil},
+	}
+
+	It("returns the index of the struct", func() {
+		Expect(main.FindStructIndexByPath("/root/primary.m3u8", input)).To(Equal(0))
+	})
+
+	It("returns -1 if the file is not present", func() {
+		Expect(main.FindStructIndexByPath("/not/present/primary.m3u8", input)).To(Equal(-1))
+	})
+
+})
+
+type mockEventInfo struct {
+	Type     notify.Event
+	BasePath string
+}
+
+func (e mockEventInfo) Event() notify.Event {
+	return e.Type
+}
+
+func (e mockEventInfo) Path() string {
+	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
+	return workingDir + e.BasePath
+}
+
+func (e mockEventInfo) Sys() interface{} {
+	return nil
+}
+
+var _ = Describe("HandleEvent", func() {
+	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
+	input := []main.Change{
+		{Path: "primary.m3u8", AbsPath: workingDir + "/tmp/primary.m3u8", Remove: false, Playlist: nil},
+		{Path: "backup.m3u8", AbsPath: workingDir + "/tmp/backup.m3u8", Remove: true, Playlist: nil},
+		{Path: "1.m3u8", AbsPath: workingDir + "/example/1.m3u8", Remove: false, Playlist: nil},
+	}
+
+	It("Updates the data struct on file creation", func() {
+		event := mockEventInfo{Type: notify.Create, BasePath: "/tmp/backup.m3u8"}
+
+		Expect(main.HandleEvent(event, input)[1].Remove).To(BeFalse())
+	})
+
+	It("Updates the data struct on file removal", func() {
+		event := mockEventInfo{Type: notify.Remove, BasePath: "/tmp/primary.m3u8"}
+
+		Expect(main.HandleEvent(event, input)[0].Remove).To(BeTrue())
+	})
+
+	It("non-tracked files do not change data struct", func() {
+		event := mockEventInfo{Type: notify.Remove, BasePath: "/tmp/not_tracked.m3u8"}
+
+		Expect(main.HandleEvent(event, input)).Should(BeEquivalentTo(input))
+	})
+
+	It("Removes a playlist if an update makes it fail parsing", func() {
+		event := mockEventInfo{Type: notify.Write, BasePath: "/example/1.m3u8"}
+
+		Expect(main.HandleEvent(event, input)[2].Remove).To(BeTrue())
+	})
+
+})
+
+var _ = Describe("CreateWatcher", func() {
+	paths := []string{"example/primary.m3u8", "example/backup.m3u8"}
+	out := main.CreateWatcher(paths)
+
+	It("Should write to out", func() {
+		Eventually(out).Should(Receive())
 	})
 
 })

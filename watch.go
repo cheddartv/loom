@@ -13,8 +13,10 @@ import (
 )
 
 type Change struct {
-	Path   string
-	Remove bool
+	Path     string
+	AbsPath  string
+	Remove   bool
+	Playlist *m3u8.MasterPlaylist
 }
 
 func CleanPath(dirty string) string {
@@ -35,6 +37,7 @@ func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
 	}
 	p, listType, err := m3u8.DecodeFrom(bufio.NewReader(f), true)
 	if err != nil {
+		log.Printf("parsing error\n")
 		return nil, err
 	}
 	if listType != m3u8.MASTER {
@@ -46,27 +49,60 @@ func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
 	}
 }
 
-func ImportInputs(dirtyPaths []string) ([]string, map[string]*m3u8.MasterPlaylist) {
-	inputStructs := make(map[string]*m3u8.MasterPlaylist)
+func ImportInputs(dirtyPaths []string) ([]string, []Change) {
+	inputStructs := make([]Change, len(dirtyPaths))
 	cleanPaths := make([]string, len(dirtyPaths))
 	for i, file := range dirtyPaths {
 		cleanfile := CleanPath(file)
 		cleanPaths[i] = cleanfile
 		mp, err := ImportPlaylist(cleanfile)
 		if err != nil {
-			log.Print(err)
+			log.Print("!!ERROR: ", err)
+			inputStructs[i] = Change{Path: file, AbsPath: cleanfile, Remove: true, Playlist: nil}
 		} else {
-			inputStructs[file] = mp
+			inputStructs[i] = Change{Path: file, AbsPath: cleanfile, Remove: false, Playlist: mp}
 		}
 	}
 
 	return cleanPaths, inputStructs
 }
 
-func CreateWatcher(paths []string) <-chan Change {
+func FindStructIndexByPath(path string, cs []Change) int {
+	for i, c := range cs {
+		if c.AbsPath == path {
+			return i
+		}
+	}
+	return -1
+}
+
+func HandleEvent(event notify.EventInfo, cs []Change) []Change {
+	p := event.Path()
+	i := FindStructIndexByPath(p, cs)
+	if i < 0 {
+		return cs
+	} else {
+		if event.Event() == notify.Remove {
+			cs[i].Remove = true
+		} else {
+			mp, err := ImportPlaylist(p)
+			if err != nil {
+				log.Print("an update created an error with the playlist", err)
+				log.Print("removing the playlist from the viable set")
+				cs[i].Remove = true
+			} else {
+				cs[i].Remove = false
+				cs[i].Playlist = mp
+			}
+		}
+	}
+	return cs
+}
+
+func CreateWatcher(paths []string) <-chan []Change {
 	in := make(chan notify.EventInfo, 10)
-	out := make(chan Change)
-	paths, _ = ImportInputs(paths)
+	out := make(chan []Change)
+	paths, allData := ImportInputs(paths)
 
 	go func() {
 		for _, p := range paths {
@@ -76,15 +112,12 @@ func CreateWatcher(paths []string) <-chan Change {
 			}
 		}
 		defer notify.Stop(in)
-
+		out <- allData
 		for {
 			ei := <-in
 			log.Println("Raw event: ", ei)
-			for _, p := range paths {
-				if ei.Path() == p {
-					out <- Change{Path: p, Remove: ei.Event() == notify.Remove}
-				}
-			}
+			allData = HandleEvent(ei, allData)
+			out <- allData
 		}
 	}()
 
