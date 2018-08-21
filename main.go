@@ -1,12 +1,6 @@
 package main
 
-<<<<<<< HEAD
 import "log"
-=======
-import (
-	"log"
-)
->>>>>>> reader and writter
 
 type Context struct {
 	Config *Config
@@ -20,13 +14,7 @@ func main() {
 	for _, m := range context.Config.Manifests {
 		inputs = append(inputs, m.Inputs...)
 	}
-<<<<<<< HEAD
 
-	evts := CreateWatcher(inputs)
-	for {
-		evt := <-evts
-		log.Println("Got an event:", evt)
-=======
 	AllData := make([]ParsedInput, 0)
 	evts := CreateWatcher(inputs)
 	setupComplete := false
@@ -47,6 +35,5 @@ func main() {
 			}
 		}
 
->>>>>>> reader and writter
 	}
 }
