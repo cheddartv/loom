@@ -2,3 +2,4 @@ vendor/*
 loom
 dist/*
 *.out
+tmp/*

@@ -10,6 +10,14 @@
   version = "v1.4.7"
 
 [[projects]]
+  digest = "1:f89f3aa237e1394f3d958bd5aae0bf2864768490f7a6763bacb2bf85001419d0"
+  name = "github.com/grafov/m3u8"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0b86a8a8eaf300b6dfaf5a7a32b6e0b86f094621"
+  version = "v0.10"
+
+[[projects]]
   branch = "master"
   digest = "1:a361611b8c8c75a1091f00027767f7779b29cb37c456a71b8f2604c88057ab40"
   name = "github.com/hashicorp/hcl"
@@ -113,6 +121,14 @@
   pruneopts = "UT"
   revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
   version = "v1.2.0"
+
+[[projects]]
+  digest = "1:ba51b2c7d37f3741fcf6319ea843e88ee6a032412858de0d89a229f1725b279d"
+  name = "github.com/rjeczalik/notify"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "52ae50d8490436622a8941bd70c3dbe0acdd4bbf"
+  version = "v0.9.0"
 
 [[projects]]
   digest = "1:bd1ae00087d17c5a748660b8e89e1043e1e5479d0fea743352cda2f8dd8c4f84"
@@ -233,8 +249,10 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/grafov/m3u8",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
+    "github.com/rjeczalik/notify",
     "github.com/spf13/viper",
   ]
   solver-name = "gps-cdcl"
