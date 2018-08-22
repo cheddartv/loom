@@ -1,9 +1,11 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
+	"sort"
 
-	"github.com/jinzhu/copier"
+	"github.com/grafov/m3u8"
 )
 
 func FindStructIndexByPath(path string, cs []ParsedInput) int {
@@ -22,7 +24,7 @@ func HandleEvent(event Change, cs []ParsedInput) []ParsedInput {
 		if event.Type == "Create" {
 			mp, err := ImportPlaylist(event.AbsPath)
 			if err != nil {
-
+				log.Printf("an error occured parsing the playlist %v ; It has not be tracked", event.Path)
 			} else {
 				cs = append(cs, ParsedInput{Path: event.Path, AbsPath: event.AbsPath, Include: true, Playlist: mp})
 			}
@@ -38,7 +40,6 @@ func HandleEvent(event Change, cs []ParsedInput) []ParsedInput {
 				log.Print("removing the playlist from the viable set")
 				cs[i].Include = false
 			} else {
-				// log.Printf("updating %v: ", cs[i])
 				cs[i].Include = true
 				cs[i].Playlist = mp
 			}
@@ -47,16 +48,31 @@ func HandleEvent(event Change, cs []ParsedInput) []ParsedInput {
 	return cs
 }
 
-func WriteManifest(manifests []ParsedInput) {
+type byBandwidth []*m3u8.Variant
 
-	master := ParsedInput{}
-	copier.Copy(&master, &manifests[0])
-	playlists := manifests[1:]
+func (s byBandwidth) Len() int {
+	return len(s)
+}
+func (s byBandwidth) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s byBandwidth) Less(i, j int) bool {
+	return s[i].VariantParams.Bandwidth > s[j].VariantParams.Bandwidth
+}
 
-	for _, v := range playlists {
-		master.Playlist.Variants = append(master.Playlist.Variants, v.Playlist.Variants...)
+func WriteManifest(manifests []ParsedInput, output string) {
+	variants := []*m3u8.Variant{}
+	for _, v := range manifests {
+		variants = append(variants, v.Playlist.Variants...)
 	}
-	log.Print("\nTrue Master\n")
-	log.Print(master.Playlist)
-	log.Print("\nEnd True Master\n")
+	sort.Sort(byBandwidth(variants))
+
+	outputManifest := m3u8.NewMasterPlaylist()
+	for _, v := range variants {
+		outputManifest.Append(v.URI, v.Chunklist, v.VariantParams)
+	}
+
+	d1 := []byte(outputManifest.Encode().String())
+	_ = ioutil.WriteFile(output, d1, 0644)
+
 }

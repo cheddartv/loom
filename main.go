@@ -14,8 +14,10 @@ func main() {
 	for _, m := range context.Config.Manifests {
 		inputs = append(inputs, m.Inputs...)
 	}
+	output := context.Config.Manifests[0].Output
+	log.Print("output is: ", output)
 
-	AllData := make([]ParsedInput, 0)
+	AllData := []ParsedInput{}
 	evts := CreateWatcher(inputs)
 	setupComplete := false
 	for {
@@ -24,12 +26,12 @@ func main() {
 
 		if setupComplete {
 			AllData = HandleEvent(evt, AllData)
-			// log.Println("Alldata is: ", AllData)
-			WriteManifest(AllData)
+
+			WriteManifest(AllData, output)
 		} else {
 			if evt.Type == "EndSetup" {
 				setupComplete = true
-				WriteManifest(AllData)
+				WriteManifest(AllData, output)
 			} else {
 				AllData = HandleEvent(evt, AllData)
 			}
