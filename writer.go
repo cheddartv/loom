@@ -63,7 +63,9 @@ func (s byBandwidth) Less(i, j int) bool {
 func WriteManifest(manifests []ParsedInput, output string) {
 	variants := []*m3u8.Variant{}
 	for _, v := range manifests {
-		variants = append(variants, v.Playlist.Variants...)
+		if v.Include {
+			variants = append(variants, v.Playlist.Variants...)
+		}
 	}
 	sort.Sort(byBandwidth(variants))
 

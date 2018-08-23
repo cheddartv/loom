@@ -18,6 +18,7 @@ type ParsedInput struct {
 
 func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
 	f, err := os.Open(file)
+	defer f.Close()
 	if err != nil {
 		log.Printf("Provided file %s errored and was skipped", file)
 		return nil, err
