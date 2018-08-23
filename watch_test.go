@@ -69,13 +69,3 @@ var _ = Describe("EventToString", func() {
 		Expect(main.EventToString(notify.Rename)).To(BeEquivalentTo(""))
 	})
 })
-
-var _ = Describe("CreateWatcher", func() {
-	paths := []string{"example/primary.m3u8", "example/backup.m3u8"}
-	out := main.CreateWatcher(paths)
-
-	It("Should write to out", func() {
-		Eventually(out).Should(Receive(Equal(main.Change{"", "", "EndSetup"})))
-	})
-
-})

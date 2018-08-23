@@ -1,41 +1,72 @@
 package main
 
-import "log"
+import (
+	"log"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+)
 
 type Context struct {
 	Config *Config
 }
 
-func main() {
+func ParseInputsOutput(cfg *Config) ([][]string, []string) {
+	inputs := [][]string{}
+	outputs := []string{}
+	for _, m := range cfg.Manifests {
+		inputs = append(inputs, m.Inputs)
+		outputs = append(outputs, m.Output)
+	}
+	return inputs, outputs
+}
+
+func Weave(inputs []string, output string, stop chan bool) {
+	AllData := []ParsedInput{}
+	evts := CreateWatcher(inputs)
+	for _, p := range inputs {
+		AllData = HandleEvent(Change{Path: p, AbsPath: CleanPath(p), Type: "Create"}, AllData)
+	}
+	WriteManifest(AllData, output)
+	for {
+		select {
+		case evt := <-evts:
+			AllData = HandleEvent(evt, AllData)
+			WriteManifest(AllData, output)
+		case <-stop:
+			log.Print("Stopping our weave")
+			return
+		}
+	}
+}
+
+func SignalSafeMain(osStop chan bool) {
+	var wg sync.WaitGroup
 	var context Context
 	context.Config = Load()
 
-	inputs := []string{}
-	for _, m := range context.Config.Manifests {
-		inputs = append(inputs, m.Inputs...)
+	inputs, outputs := ParseInputsOutput(context.Config)
+	workers := len(outputs)
+	stopChannel := make(chan bool)
+
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go Weave(inputs[i], outputs[i], stopChannel)
+		wg.Done()
 	}
-	output := context.Config.Manifests[0].Output
-	log.Print("output is: ", output)
+	wg.Wait()
+}
 
-	AllData := []ParsedInput{}
-	evts := CreateWatcher(inputs)
-	setupComplete := false
-	for {
-		evt := <-evts
-		log.Println("Got an event:", evt)
-
-		if setupComplete {
-			AllData = HandleEvent(evt, AllData)
-
-			WriteManifest(AllData, output)
-		} else {
-			if evt.Type == "EndSetup" {
-				setupComplete = true
-				WriteManifest(AllData, output)
-			} else {
-				AllData = HandleEvent(evt, AllData)
-			}
-		}
-
-	}
+func main() {
+	osStop := make(chan os.Signal, 1)
+	closing := make(chan bool, 1)
+	signal.Notify(osStop, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		sig := <-osStop
+		log.Print("recieved a signal, killing all workers: ", sig)
+		closing <- true
+	}()
+	SignalSafeMain(closing)
+	<-closing
 }

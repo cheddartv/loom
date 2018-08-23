@@ -45,13 +45,11 @@ func CreateWatcher(paths []string) <-chan Change {
 	go func() {
 		for _, p := range paths {
 			pathsMap[CleanPath(p)] = p
-			out <- Change{Path: p, AbsPath: CleanPath(p), Type: EventToString(notify.Create)}
 			d := path.Dir(p)
 			if err := notify.Watch(d+"/...", in, notify.Create, notify.Remove, notify.Write); err != nil {
 				log.Fatal(err)
 			}
 		}
-		out <- Change{Path: "", AbsPath: "", Type: "EndSetup"}
 		defer notify.Stop(in)
 		for {
 			ei := <-in

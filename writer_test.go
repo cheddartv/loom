@@ -70,7 +70,7 @@ var _ = Describe("WriteManifest", func() {
 	mp1, _ := main.ImportPlaylist(workingDir + "/example/primary.m3u8")
 	mp2, _ := main.ImportPlaylist(workingDir + "/example/backup.m3u8")
 	manifests := []main.ParsedInput{
-		{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary.m3u8", Include: false, Playlist: mp1},
+		{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary.m3u8", Include: true, Playlist: mp1},
 		{Path: "backup.m3u8", AbsPath: workingDir + "/example/backup.m3u8", Include: true, Playlist: mp2},
 	}
 	It("Generates and output file", func() {
