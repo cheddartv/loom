@@ -22,6 +22,12 @@
       "from": "loom",
       "to": "/usr/bin",
       "fperm": "0755"
+    },
+    {
+      "from": "deb/loom.yml",
+      "to": "/etc/",
+      "base": "deb",
+      "fperm": "0644"
     }
   ],
   "copyrights": [

@@ -1,0 +1,13 @@
+# This file configures the loom HLS packaging service. It's main function
+# is to map an array of input master manifests to a single, interleaved
+# output manifest.
+#
+# manifests:
+#   - output: /path/to/output.m3u8
+#     inputs:
+#       - /path/to/primary.m3u8
+#       - /path/to/backup.m3u8
+#   - output: /path/to/another/output.m3u8
+#     inputs:
+#       - /path/to/another/primary.m3u8
+#       - /path/to/another/backup.m3u8
