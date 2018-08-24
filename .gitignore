@@ -3,3 +3,5 @@ loom
 dist/*
 *.out
 tmp/*
+
+.pc
