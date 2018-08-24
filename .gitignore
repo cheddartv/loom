@@ -1,8 +1,9 @@
 vendor/*
-loom
+/loom
 dist/*
 *.out
 tmp/*
 .pc
 *.deb
+*.swp
 pkg-build/*

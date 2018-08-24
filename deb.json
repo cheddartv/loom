@@ -28,6 +28,12 @@
       "to": "/etc/",
       "base": "deb",
       "fperm": "0644"
+    },
+    {
+      "from": "deb/loom",
+      "to": "/etc/init.d/",
+      "base": "deb",
+      "fperm": "0755"
     }
   ],
   "copyrights": [
@@ -61,7 +67,7 @@
   "init-file": "",
   "default-file": "",
   "preinst-file": "",
-  "postinst-file": "",
+  "postinst-file": "deb/postinst.sh",
   "prerm-file": "",
   "postrm-file": "",
   "changelog-file": "",
