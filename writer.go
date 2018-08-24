@@ -9,9 +9,9 @@ import (
 	"github.com/grafov/m3u8"
 )
 
-func FindStructIndexByPath(path string, cs []ParsedInput) int {
+func FindStructIndexByPath(abspath string, cs []ParsedInput) int {
 	for i, c := range cs {
-		if c.Path == path {
+		if c.AbsPath == abspath {
 			return i
 		}
 	}
@@ -19,7 +19,7 @@ func FindStructIndexByPath(path string, cs []ParsedInput) int {
 }
 
 func HandleEvent(event Change, cs []ParsedInput) []ParsedInput {
-	i := FindStructIndexByPath(event.Path, cs)
+	i := FindStructIndexByPath(event.AbsPath, cs)
 	log.Printf("i: %v, event.path: %v", i, event.Path)
 	if i < 0 {
 		if event.Type == "Create" {

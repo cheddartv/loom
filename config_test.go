@@ -23,6 +23,6 @@ var _ = Describe("loading configuration file", func() {
 	})
 
 	It("configures the correct inputs", func() {
-		Expect(c.Manifests[0].Inputs).To(Equal([]string{"example/primary/primary.m3u8", "example/backup/backup.m3u8"}))
+		Expect(c.Manifests[0].Inputs).To(Equal([]string{"example/primary/index.m3u8", "example/backup/index.m3u8"}))
 	})
 })

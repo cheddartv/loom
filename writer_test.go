@@ -13,11 +13,11 @@ import (
 
 var _ = Describe("FindStructIndexByPath", func() {
 	input := []main.ParsedInput{
-		{Path: "primary.m3u8", AbsPath: "/root/primary.m3u8", Include: true, Playlist: nil},
-		{Path: "primary2.m3u8", AbsPath: "/root/primary2.m3u8", Include: true, Playlist: nil},
+		{Path: "index.m3u8", AbsPath: "/root/index.m3u8", Include: true, Playlist: nil},
+		{Path: "index2.m3u8", AbsPath: "/root/index2.m3u8", Include: true, Playlist: nil},
 	}
 	It("returns the index of the struct", func() {
-		Expect(main.FindStructIndexByPath("primary.m3u8", input)).To(Equal(0))
+		Expect(main.FindStructIndexByPath("/root/index.m3u8", input)).To(Equal(0))
 	})
 	It("returns -1 if the file is not present", func() {
 		Expect(main.FindStructIndexByPath("not_present.m3u8", input)).To(Equal(-1))
@@ -27,16 +27,16 @@ var _ = Describe("FindStructIndexByPath", func() {
 var _ = Describe("HandleEvent", func() {
 	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
 	input := []main.ParsedInput{
-		{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary/primary.m3u8", Include: false, Playlist: nil},
-		{Path: "backup.m3u8", AbsPath: workingDir + "/example/backup/backup.m3u8", Include: true, Playlist: nil},
+		{Path: "index.m3u8", AbsPath: workingDir + "/example/primary/index.m3u8", Include: false, Playlist: nil},
+		{Path: "index.m3u8", AbsPath: workingDir + "/example/backup/index.m3u8", Include: true, Playlist: nil},
 		{Path: "1.m3u8", AbsPath: workingDir + "/example/primary/1.m3u8", Include: false, Playlist: nil},
 	}
 	It("Updates the data struct on file creation", func() {
-		change := main.Change{Path: "backup.m3u8", AbsPath: workingDir + "/example/backup/backup.m3u8", Type: "Create"}
+		change := main.Change{Path: "index.m3u8", AbsPath: workingDir + "/example/backup/index.m3u8", Type: "Create"}
 		Expect(main.HandleEvent(change, input)[1].Include).To(BeTrue())
 	})
 	It("Updates the data struct on file removal", func() {
-		change := main.Change{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary/primary.m3u8", Type: "Remove"}
+		change := main.Change{Path: "index.m3u8", AbsPath: workingDir + "/example/primary/index.m3u8", Type: "Remove"}
 		Expect(main.HandleEvent(change, input)[0].Include).To(BeFalse())
 	})
 	It("non-tracked files do not change data struct", func() {
@@ -49,15 +49,15 @@ var _ = Describe("HandleEvent", func() {
 	})
 	It("Updates the data struct for create on file not in the struct", func() {
 		input := []main.ParsedInput{
-			{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary/primary.m3u8", Include: false, Playlist: nil},
+			{Path: "index.m3u8", AbsPath: workingDir + "/example/primary/index.m3u8", Include: true, Playlist: nil},
 			{Path: "1.m3u8", AbsPath: workingDir + "/example/primary/1.m3u8", Include: false, Playlist: nil},
 		}
-		change := main.Change{Path: "backup.m3u8", AbsPath: workingDir + "/example/backup/backup.m3u8", Type: "Create"}
-		Expect(main.HandleEvent(change, input)[2].Path).To(BeEquivalentTo("backup.m3u8"))
+		change := main.Change{Path: "index.m3u8", AbsPath: workingDir + "/example/backup/index.m3u8", Type: "Create"}
+		Expect(len(main.HandleEvent(change, input))).To(BeEquivalentTo(3))
 	})
 	It("Does not track a create on a playlist that fails to parse", func() {
 		input := []main.ParsedInput{
-			{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary/primary.m3u8", Include: false, Playlist: nil},
+			{Path: "index.m3u8", AbsPath: workingDir + "/example/primary/index.m3u8", Include: false, Playlist: nil},
 		}
 		change := main.Change{Path: "1.m3u8", AbsPath: workingDir + "/example/primary/1.m3u8", Type: "Create"}
 		Expect(main.HandleEvent(change, input)).To(BeEquivalentTo(input))
@@ -67,11 +67,11 @@ var _ = Describe("HandleEvent", func() {
 var _ = Describe("WriteManifest", func() {
 	output := "tmp/index.m3u8"
 	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
-	mp1, _ := main.ImportPlaylist(workingDir + "/example/primary/primary.m3u8")
-	mp2, _ := main.ImportPlaylist(workingDir + "/example/backup/backup.m3u8")
+	mp1, _ := main.ImportPlaylist(workingDir + "/example/primary/index.m3u8")
+	mp2, _ := main.ImportPlaylist(workingDir + "/example/backup/index.m3u8")
 	manifests := []main.ParsedInput{
-		{Path: "primary.m3u8", AbsPath: workingDir + "/example/primary/primary.m3u8", Include: true, Playlist: mp1},
-		{Path: "backup.m3u8", AbsPath: workingDir + "/example/backup/backup.m3u8", Include: true, Playlist: mp2},
+		{Path: "index.m3u8", AbsPath: workingDir + "/example/primary/index.m3u8", Include: true, Playlist: mp1},
+		{Path: "index.m3u8", AbsPath: workingDir + "/example/backup/index.m3u8", Include: true, Playlist: mp2},
 	}
 	It("Generates and output file", func() {
 		main.WriteManifest(manifests, main.CleanPath("tmp/index.m3u8"))
