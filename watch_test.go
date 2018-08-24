@@ -69,3 +69,16 @@ var _ = Describe("EventToString", func() {
 		Expect(main.EventToString(notify.Rename)).To(BeEquivalentTo(""))
 	})
 })
+
+var _ = Describe("ProcessFsEvent", func() {
+	ev := mockEventInfo{Type: notify.Create, BasePath: "primary/sample.m3u8"}
+	It("returns a change object", func() {
+		Expect(main.ProcessFsEvent(ev, "tmp/last.m3u8").Type).To(BeEquivalentTo("Create"))
+	})
+	It("returns a change object", func() {
+		Expect(main.ProcessFsEvent(ev, "tmp/last.m3u8").Path).To(BeEquivalentTo("tmp/last.m3u8"))
+	})
+	It("returns a change object", func() {
+		Expect(main.ProcessFsEvent(ev, "tmp/last.m3u8").AbsPath).To(BeEquivalentTo(ev.Path()))
+	})
+})
