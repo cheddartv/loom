@@ -26,8 +26,8 @@ var _ = Describe("import playlist from file", func() {
 		Expect(err).Should(HaveOccurred())
 	})
 	It("returns a struct of the masterplaylist", func() {
-		playlist, err := main.ImportPlaylist("./example/primary.m3u8")
-		Expect(playlist.Variants[0].URI).To(Equal("primary/1.m3u8"))
+		playlist, err := main.ImportPlaylist("./example/primary/primary.m3u8")
+		Expect(playlist.Variants[0].URI).To(Equal("1.m3u8"))
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 })
