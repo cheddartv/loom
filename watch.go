@@ -37,25 +37,34 @@ func EventToString(event notify.Event) string {
 	}
 }
 
+func InitWatchers(paths []string, in chan notify.EventInfo) map[string]string {
+	pathsMap := make(map[string]string)
+	for _, p := range paths {
+		pathsMap[CleanPath(p)] = p
+		d := path.Dir(p)
+		if err := notify.Watch(d+"/...", in, notify.Create, notify.Remove, notify.Write); err != nil {
+			log.Fatal(err)
+		}
+	}
+	return pathsMap
+}
+
+func ProcessFsEvent(event notify.EventInfo, path string) Change {
+	return Change{Path: path, AbsPath: event.Path(), Type: EventToString(event.Event())}
+}
+
 func CreateWatcher(paths []string) <-chan Change {
 	in := make(chan notify.EventInfo, 10)
 	out := make(chan Change)
-	pathsMap := make(map[string]string)
+	var pathsMap map[string]string
 
 	go func() {
-		for _, p := range paths {
-			pathsMap[CleanPath(p)] = p
-			d := path.Dir(p)
-			if err := notify.Watch(d+"/...", in, notify.Create, notify.Remove, notify.Write); err != nil {
-				log.Fatal(err)
-			}
-		}
+		pathsMap = InitWatchers(paths, in)
 		defer notify.Stop(in)
 		for {
 			ei := <-in
-			log.Println("Raw event: ", ei)
 			if p, ok := pathsMap[ei.Path()]; ok {
-				out <- Change{Path: p, AbsPath: ei.Path(), Type: EventToString(ei.Event())}
+				out <- ProcessFsEvent(ei, p)
 			}
 		}
 	}()
