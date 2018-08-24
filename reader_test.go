@@ -26,15 +26,15 @@ var _ = Describe("import playlist from file", func() {
 		Expect(err).Should(HaveOccurred())
 	})
 	It("returns a struct of the masterplaylist", func() {
-		playlist, err := main.ImportPlaylist("./example/primary.m3u8")
-		Expect(playlist.Variants[0].URI).To(Equal("primary/1.m3u8"))
+		playlist, err := main.ImportPlaylist("./example/primary/index.m3u8")
+		Expect(playlist.Variants[0].URI).To(Equal("1.m3u8"))
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 })
 var _ = Describe("importInputs playlists from paths", func() {
 	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
 	It("cleans the paths", func() {
-		paths := []string{"example/primary.m3u8", "example/backup.m3u8"}
+		paths := []string{"example/index.m3u8", "example/index.m3u8"}
 		c, _ := main.ImportInputs(paths)
 		Expect(c[0]).To(Equal(workingDir + "/" + paths[0]))
 		Expect(c[1]).To(Equal(workingDir + "/" + paths[1]))

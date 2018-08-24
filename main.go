@@ -25,6 +25,7 @@ func ParseInputsOutput(cfg *Config) ([][]string, []string) {
 func Weave(inputs []string, output string, stop chan bool) {
 	AllData := []ParsedInput{}
 	evts := CreateWatcher(inputs)
+	output = CleanPath(output)
 	for _, p := range inputs {
 		AllData = HandleEvent(Change{Path: p, AbsPath: CleanPath(p), Type: "Create"}, AllData)
 	}

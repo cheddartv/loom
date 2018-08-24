@@ -3,14 +3,15 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"path/filepath"
 	"sort"
 
 	"github.com/grafov/m3u8"
 )
 
-func FindStructIndexByPath(path string, cs []ParsedInput) int {
+func FindStructIndexByPath(abspath string, cs []ParsedInput) int {
 	for i, c := range cs {
-		if c.Path == path {
+		if c.AbsPath == abspath {
 			return i
 		}
 	}
@@ -18,7 +19,7 @@ func FindStructIndexByPath(path string, cs []ParsedInput) int {
 }
 
 func HandleEvent(event Change, cs []ParsedInput) []ParsedInput {
-	i := FindStructIndexByPath(event.Path, cs)
+	i := FindStructIndexByPath(event.AbsPath, cs)
 	log.Printf("i: %v, event.path: %v", i, event.Path)
 	if i < 0 {
 		if event.Type == "Create" {
@@ -62,9 +63,13 @@ func (s byBandwidth) Less(i, j int) bool {
 
 func WriteManifest(manifests []ParsedInput, output string) {
 	variants := []*m3u8.Variant{}
-	for _, v := range manifests {
-		if v.Include {
-			variants = append(variants, v.Playlist.Variants...)
+	for _, input := range manifests {
+		if input.Include {
+			for _, v := range input.Playlist.Variants {
+				rel, _ := filepath.Rel(filepath.Dir(output), filepath.Dir(input.AbsPath))
+				v.URI = rel + "/" + v.URI
+				variants = append(variants, v)
+			}
 		}
 	}
 	sort.Sort(byBandwidth(variants))
