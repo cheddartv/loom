@@ -3,5 +3,6 @@ loom
 dist/*
 *.out
 tmp/*
-
 .pc
+*.deb
+pkg-build/*
