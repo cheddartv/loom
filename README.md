@@ -3,21 +3,24 @@
 
 [![CircleCI](https://circleci.com/gh/cheddartv/loom.svg?style=shield)](https://circleci.com/gh/cheddartv/loom)
 
-Loom is a HLS inter-weaving tool designed to create a redundant manifest. This allows your stream to continue even if one of your streams goes down. By weaving together any number of index manifests loom creates one manifest referencing all of them.
+Loom is a HLS inter-weaving tool designed to create a redundant manifest. This allows your stream to continue
+even if one of your streams goes down. By weaving together any number of index manifests loom creates one manifest
+referencing all of them.
 
 ## Installing
 
-Install loom on your server that generates your primary HLS stream,:
+Download the latest release from [](https://github.com/cheddartv/loom/releases) on the server that generates your primary HLS stream. Then run:
 ```
-sudo apt update
-sudo apt install loom
+dpkg -i <path-to-downloaded-deb-file>
 ```
 
 ## Configuration
 
 Once installed, you need to configure loom for your system. This is all done through /etc/loom.yml
 
-Here you can list multiple instances of output manifests. For each output manifest, there is a list of inputs that will be woven together. Loom will create a thread for each output listed, weave the inputs together, and then watch the inputs for changes. If the input files change, loom will likewise update the output.
+Here you can list multiple instances of output manifests. For each output manifest, there is a list of inputs that will be woven
+together. Loom will create a thread for each output listed, weave the inputs together, and then watch the inputs for changes. If
+the input files change, loom will likewise update the output.
 
 
 ```
@@ -32,7 +35,10 @@ manifests:
       - example/backup/index2.m3u8
 ```
 
-An update to /etc/loom.yml requires that loom be restarted to initialize the new values in the process
+An update to /etc/loom.yml requires that loom be restarted to initialize the new values in the process:
+```
+sudo /etc/init.d/loom restart
+```
 
 ## Example Output
 ```
