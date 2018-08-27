@@ -9,7 +9,8 @@ referencing all of them.
 
 ## Installing
 
-Download the latest release from [](https://github.com/cheddartv/loom/releases) on the server that generates your primary HLS stream. Then run:
+Download the latest release from [https://github.com/cheddartv/loom/releases](https://github.com/cheddartv/loom/releases)
+on the server that generates your primary HLS stream. Then run:
 ```
 dpkg -i <path-to-downloaded-deb-file>
 ```
