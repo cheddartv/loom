@@ -1,15 +1,15 @@
 # Loom
-Loom is a HLS inter-weaving tool designed to create a redundant manifest. This alows your stream to continue even if one of your streams goes down. By weaving together any number of index manifests loom creates one manifest referencing all of them.
+Loom is a HLS inter-weaving tool designed to create a redundant manifest. This allows your stream to continue even if one of your streams goes down. By weaving together any number of index manifests loom creates one manifest referencing all of them.
 
 ## Installing
 
-On your server that generates your primary HLS stream, install loom:
+Install loom on your server that generates your primary HLS stream,:
 ```
 sudo apt update
 sudo apt install loom
 ```
 
-## Deployment
+## Configuration
 
 Once installed, you need to configure loom for your system. This is all done through loom.yml
 
@@ -28,7 +28,7 @@ manifests:
       - example/backup/index2.m3u8
 ```
 
-An update to loom.yml requires that loom be restarted to initilaze the new values in the process
+An update to loom.yml requires that loom be restarted to initialize the new values in the process
 
 ## Example Output
 ```
@@ -70,3 +70,4 @@ The current test suite is dependent on the included loom.yml. Changes to the con
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
