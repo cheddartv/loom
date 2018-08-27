@@ -2,6 +2,7 @@
 # Loom
 
 [![CircleCI](https://circleci.com/gh/cheddartv/loom.svg?style=shield)](https://circleci.com/gh/cheddartv/loom)
+
 Loom is a HLS inter-weaving tool designed to create a redundant manifest. This allows your stream to continue even if one of your streams goes down. By weaving together any number of index manifests loom creates one manifest referencing all of them.
 
 ## Installing
