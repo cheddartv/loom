@@ -30,6 +30,20 @@ manifests:
 
 An update to loom.yml requires that loom be restarted to initilaze the new values in the process
 
+## Example Output
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=8171676,CODECS="avc1.4d4028,mp4a.40.5",RESOLUTION=1920x1080
+../example/primary/1.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=8171676,CODECS="avc1.4d4028,mp4a.40.5",RESOLUTION=1920x1080
+../example/backup/1.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6332540,CODECS="avc1.4d401f,mp4a.40.5",RESOLUTION=1280x720
+../example/primary/2.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6332540,CODECS="avc1.4d401f,mp4a.40.5",RESOLUTION=1280x720
+../example/backup/2.m3u8
+```
+
 ### Prerequisites 
 
 Currently loom does not support Windows
