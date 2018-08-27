@@ -11,7 +11,7 @@ sudo apt install loom
 
 ## Configuration
 
-Once installed, you need to configure loom for your system. This is all done through loom.yml
+Once installed, you need to configure loom for your system. This is all done through /etc/loom.yml
 
 Here you can list multiple instances of output manifests. For each output manifest, there is a list of inputs that will be woven together. Loom will create a thread for each output listed, weave the inputs together, and then watch the inputs for changes. If the input files change, loom will likewise update the output.
 
@@ -28,7 +28,7 @@ manifests:
       - example/backup/index2.m3u8
 ```
 
-An update to loom.yml requires that loom be restarted to initialize the new values in the process
+An update to /etc/loom.yml requires that loom be restarted to initialize the new values in the process
 
 ## Example Output
 ```
@@ -44,14 +44,13 @@ An update to loom.yml requires that loom be restarted to initialize the new valu
 ../example/backup/2.m3u8
 ```
 
-### Prerequisites 
+### Prerequisites
 
 Currently loom does not support Windows
 
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
 
 ## Running the tests
 
@@ -70,4 +69,3 @@ The current test suite is dependent on the included loom.yml. Changes to the con
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
