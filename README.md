@@ -30,17 +30,13 @@ manifests:
 
 An update to loom.yml requires that loom be restarted to initilaze the new values in the process
 
-### Prerequisites <i don't think we have any?>
+### Prerequisites 
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+Currently loom does not support Windows
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 
 ## Running the tests
@@ -53,16 +49,10 @@ The current test suite is dependent on the included loom.yml. Changes to the con
 
 ## Authors
 
-* [Ross Cooperman](https://github.com/rosscooperman) - *Initial work*
-* [Paul Jones](https://github.com/paulijones) - *Initial work*
+* [Ross Cooperman](https://github.com/rosscooperman) - *Initial work*, Organization: [Cheddar](https://github.com/cheddartv)
+* [Paul Jones](https://github.com/paulijones) - *Initial work* Organization: [Cheddar](https://github.com/cheddartv)
 
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
