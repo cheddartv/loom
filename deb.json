@@ -24,14 +24,13 @@
       "fperm": "0755"
     },
     {
-      "from": "deb/loom.yml",
-      "to": "/etc/",
-      "base": "deb",
-      "fperm": "0644"
+      "from": "deb/etc/**/**",
+      "to": "/",
+      "base": "deb"
     },
     {
-      "from": "deb/loom",
-      "to": "/etc/init.d/",
+      "from": "deb/etc/init.d/**",
+      "to": "/",
       "base": "deb",
       "fperm": "0755"
     }
