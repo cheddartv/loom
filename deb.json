@@ -1,0 +1,76 @@
+{
+  "name": "loom",
+  "version": "0.0.1",
+  "maintainer": "Cheddar Engineering <dev@cheddar.com>",
+  "changed-by": "Paul Jones <paul.jones@cheddar.com>",
+  "section": "video",
+  "priority": "extra",
+  "arch": "amd64",
+  "homepage": "https://github.com/cheddartv/loom",
+  "vcs": [
+    {
+      "type": "vcs-browser",
+      "url": "https://github.com/cheddartv/loom"
+    },
+    {
+      "type": "vcs-git",
+      "url": "https://github.com/cheddartv/loom.git -b master"
+    }
+  ],
+  "files": [
+    {
+      "from": "loom",
+      "to": "/usr/bin",
+      "fperm": "0755"
+    },
+    {
+      "from": "deb/etc/**/**",
+      "to": "/",
+      "base": "deb"
+    },
+    {
+      "from": "deb/etc/init.d/**",
+      "to": "/",
+      "base": "deb",
+      "fperm": "0755"
+    }
+  ],
+  "copyrights": [
+    {
+      "files": "*",
+      "copyright": "2018 Cheddar, Inc. <dev@cheddar.com>",
+      "license": "MIT"
+    }
+  ],
+  "essential": false,
+  "depends": [
+    "libc6 (>= 2.2.1)"
+  ],
+  "recommends": [
+    "libc6 (>= 2.2.1)"
+  ],
+  "suggests": [
+    "libc6 (>= 2.2.1)"
+  ],
+  "enhances": [
+    "libc6 (>= 2.2.1)"
+  ],
+  "pre-depends": [
+    "libc6 (>= 2.2.1)"
+  ],
+  "built-using": "gcc-4.6 (= 4.6.0-11)",
+  "description": "Stitch multiple HLS manifests into a single, redundant manifest",
+  "description-extended": "Loom allows two (or more) manifests for a single live HLS stream to be stitched together using Apple's standard for redundant HLS master manifests.",
+  "package-type": "deb",
+  "systemd-file": "",
+  "init-file": "",
+  "default-file": "",
+  "preinst-file": "",
+  "postinst-file": "deb/postinst.sh",
+  "prerm-file": "",
+  "postrm-file": "",
+  "changelog-file": "",
+  "changelog-cmd": "",
+  "mans": [],
+  "menus": []
+}
