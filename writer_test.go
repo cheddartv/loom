@@ -81,7 +81,7 @@ var _ = Describe("WriteManifest", func() {
 	It("sorts weaves and sorts by bitrate", func() {
 		filebyteBuffer, _ := ioutil.ReadFile(output)
 		filecontents := string(filebyteBuffer)
-		Expect(filecontents).Should(MatchRegexp("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=8171676,CODECS=\"avc1.4d4028,mp4a.40.5\",RESOLUTION=1920x1080\n../example/primary/1.m3u8\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=8171676,CODECS=\"avc1.4d4028,mp4a.40.5\",RESOLUTION=1920x1080\n../example/backup/1.m3u8\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6332540,CODECS=\"avc1.4d401f,mp4a.40.5\",RESOLUTION=1280x720\n../example/primary/2.m3u8\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6332540,CODECS=\"avc1.4d401f,mp4a.40.5\",RESOLUTION=1280x720\n../example/backup/2.m3u8"))
+		Expect(filecontents).Should(MatchRegexp("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=8171676,CODECS=\"avc1.4d4028,mp4a.40.5\",RESOLUTION=1920x1080\n../example/primary/1.m3u8\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=8171676,CODECS=\"avc1.4d4028,mp4a.40.5\",RESOLUTION=1920x1080\n../example/backup/1.m3u8\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6332540,CODECS=\"avc1.4d401f,mp4a.40.5\",RESOLUTION=1280x720\n../example/primary/2.m3u8\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6332540,CODECS=\"avc1.4d401f,mp4a.40.5\",RESOLUTION=1280x720\n../example/primary/3.m3u8\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6332540,CODECS=\"avc1.4d401f,mp4a.40.5\",RESOLUTION=1280x720\n../example/backup/2.m3u8"))
 	})
 
 })
