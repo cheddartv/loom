@@ -1,8 +1,8 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"sort"
 
@@ -84,6 +84,12 @@ type variantWithPosition struct {
 	variant          *m3u8.Variant
 }
 
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
 func WriteManifest(manifests []ParsedInput, output string) {
 	variants := []variantWithPosition{}
 	variantToPath := make(map[*m3u8.Variant]string)
@@ -104,6 +110,12 @@ func WriteManifest(manifests []ParsedInput, output string) {
 	}
 
 	d1 := []byte(outputManifest.Encode().String())
-	_ = ioutil.WriteFile(output, d1, 0644)
+	tmpfile, err := os.Create(output + ".tmp")
+	check(err)
+	defer tmpfile.Close()
+	tmpfile.Write(d1)
+	tmpfile.Sync()
+	err = os.Rename(output+".tmp", output)
+	check(err)
 
 }
