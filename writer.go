@@ -58,7 +58,7 @@ func HandleEvent(event Change, cs []ParsedInput) []ParsedInput {
 	}
 }
 
-type byBandwidth []*m3u8.Variant
+type byBandwidth []variantWithPosition
 
 func (s byBandwidth) Len() int {
 	return len(s)
@@ -67,17 +67,31 @@ func (s byBandwidth) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 func (s byBandwidth) Less(i, j int) bool {
-	return s[i].VariantParams.Bandwidth > s[j].VariantParams.Bandwidth
+	if s[i].variant.VariantParams.Bandwidth == s[j].variant.VariantParams.Bandwidth {
+		if s[i].inputPosition == s[j].inputPosition {
+			return s[i].manifestPosition < s[j].manifestPosition
+		} else {
+			return s[i].inputPosition < s[j].inputPosition
+		}
+	} else {
+		return s[i].variant.VariantParams.Bandwidth > s[j].variant.VariantParams.Bandwidth
+	}
+}
+
+type variantWithPosition struct {
+	inputPosition    int
+	manifestPosition int
+	variant          *m3u8.Variant
 }
 
 func WriteManifest(manifests []ParsedInput, output string) {
-	variants := []*m3u8.Variant{}
+	variants := []variantWithPosition{}
 	variantToPath := make(map[*m3u8.Variant]string)
-	for _, input := range manifests {
+	for i, input := range manifests {
 		if input.Include {
-			for _, v := range input.Playlist.Variants {
+			for j, v := range input.Playlist.Variants {
 				variantToPath[v] = input.AbsPath
-				variants = append(variants, v)
+				variants = append(variants, variantWithPosition{inputPosition: i, manifestPosition: j, variant: v})
 			}
 		}
 	}
@@ -85,8 +99,8 @@ func WriteManifest(manifests []ParsedInput, output string) {
 
 	outputManifest := m3u8.NewMasterPlaylist()
 	for _, v := range variants {
-		rel, _ := filepath.Rel(filepath.Dir(output), filepath.Dir(variantToPath[v]))
-		outputManifest.Append(rel+"/"+v.URI, v.Chunklist, v.VariantParams)
+		rel, _ := filepath.Rel(filepath.Dir(output), filepath.Dir(variantToPath[v.variant]))
+		outputManifest.Append(rel+"/"+v.variant.URI, v.variant.Chunklist, v.variant.VariantParams)
 	}
 
 	d1 := []byte(outputManifest.Encode().String())
