@@ -40,7 +40,7 @@ case "$1" in
   start)
 	check_dev_null
 	log_daemon_msg "Starting the Loom HLS repackaging service" "loom" || true
-	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/loom.pid --make-pidfile --exec /usr/bin/loom > /var/log/loom --background; then
+	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/loom.pid --exec /usr/bin/loom > /var/log/loom --background; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -48,7 +48,7 @@ case "$1" in
 	;;
   stop)
 	log_daemon_msg "Stopping the Loom HLS repackaging service" "loom" || true
-	if start-stop-daemon --stop --quiet --oknodo --pidfile /var/run/loom.pid --remove-pidfile; then
+	if start-stop-daemon --stop --quiet --oknodo --pidfile /var/run/loom.pid; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -57,9 +57,9 @@ case "$1" in
 
   restart)
 	log_daemon_msg "Restarting the Loom HLS repackaging service" "loom" || true
-	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile /var/run/loom.pid --remove-pidfile
+	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile /var/run/loom.pid
 	check_dev_null log_end_msg
-	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/loom.pid --make-pidfile --exec /usr/bin/loom > /var/log/loom --background; then
+	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/loom.pid --exec /usr/bin/loom > /var/log/loom --background; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
