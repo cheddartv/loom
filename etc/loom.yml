@@ -1,3 +1,4 @@
+pidfile: /var/run/loom.pid
 manifests:
   - output: tmp/index.m3u8
     inputs:

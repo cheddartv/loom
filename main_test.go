@@ -19,6 +19,17 @@ var _ = Describe("ParsedInputsOutput", func() {
 	})
 })
 
+var _ = Describe("ParsePidFile", func() {
+	var context main.Context
+	context.Config = main.Load()
+
+	It("parses the yml file", func() {
+		pidFile := main.ParsePidFile(context.Config)
+		Expect(pidFile).To(BeEquivalentTo("/var/run/loom.pid"))
+	})
+
+})
+
 var _ = Describe("Weave", func() {
 	var context main.Context
 	context.Config = main.Load()
@@ -34,11 +45,13 @@ var _ = Describe("Weave", func() {
 })
 
 var _ = Describe("Main exits", func() {
+	var context main.Context
+	context.Config = main.Load()
 	It("Should eventually exit", func() {
 		stop := make(chan bool, 1)
 		stop <- true
 		Eventually(func() bool {
-			main.SignalSafeMain(stop)
+			main.SignalSafeMain(stop, context)
 			return true
 		}).Should(BeTrue())
 	})

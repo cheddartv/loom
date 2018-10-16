@@ -13,6 +13,7 @@ type manifest struct {
 
 type Config struct {
 	Manifests []manifest
+	PidFile   string
 }
 
 func Load() *Config {

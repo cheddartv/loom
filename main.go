@@ -6,6 +6,8 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/Wang/pid"
 )
 
 type Context struct {
@@ -15,11 +17,20 @@ type Context struct {
 func ParseInputsOutput(cfg *Config) ([][]string, []string) {
 	inputs := [][]string{}
 	outputs := []string{}
+
 	for _, m := range cfg.Manifests {
 		inputs = append(inputs, m.Inputs)
 		outputs = append(outputs, m.Output)
 	}
 	return inputs, outputs
+}
+
+func ParsePidFile(cfg *Config) string {
+	if cfg.PidFile == "" {
+		return "/var/run/loom.pid"
+	} else {
+		return cfg.PidFile
+	}
 }
 
 func Weave(inputs []string, output string, stop chan bool) {
@@ -42,10 +53,8 @@ func Weave(inputs []string, output string, stop chan bool) {
 	}
 }
 
-func SignalSafeMain(osStop chan bool) {
+func SignalSafeMain(osStop chan bool, context Context) {
 	var wg sync.WaitGroup
-	var context Context
-	context.Config = Load()
 
 	inputs, outputs := ParseInputsOutput(context.Config)
 	stopChannel := make(chan bool)
@@ -59,14 +68,23 @@ func SignalSafeMain(osStop chan bool) {
 }
 
 func main() {
+	var context Context
+	context.Config = Load()
+	pidFile := ParsePidFile(context.Config)
 	osStop := make(chan os.Signal, 1)
 	closing := make(chan bool, 1)
 	signal.Notify(osStop, syscall.SIGINT, syscall.SIGTERM)
+	_, err := pid.Create(pidFile)
+	if err != nil {
+		log.Printf("create pid:%s", err.Error())
+		os.Exit(1)
+	}
 	go func() {
 		sig := <-osStop
 		log.Print("recieved a signal, killing all workers: ", sig)
+		os.Remove(pidFile)
 		closing <- true
 	}()
-	SignalSafeMain(closing)
+	SignalSafeMain(closing, context)
 	<-closing
 }
