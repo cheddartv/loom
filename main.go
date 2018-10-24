@@ -60,6 +60,7 @@ func SignalSafeMain(osStop chan bool, context Context) {
 
 	inputs, outputs := ParseInputsOutput(context.Config)
 	stopChannel := make(chan bool)
+
 	for i, out := range outputs {
 		wg.Add(1)
 		go Weave(inputs[i], out, stopChannel)
