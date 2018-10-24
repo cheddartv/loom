@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("ParsedInputsOutput", func() {
 	var context main.Context
-	context.Config = main.Load()
+	context.Config = main.Load("")
 
 	It("parses the yml file", func() {
 		inputs, _ := main.ParseInputsOutput(context.Config)
@@ -21,7 +21,7 @@ var _ = Describe("ParsedInputsOutput", func() {
 
 var _ = Describe("ParsePidFile", func() {
 	var context main.Context
-	context.Config = main.Load()
+	context.Config = main.Load("")
 
 	It("parses the yml file", func() {
 		pidFile := main.ParsePidFile(context.Config)
@@ -32,7 +32,7 @@ var _ = Describe("ParsePidFile", func() {
 
 var _ = Describe("Weave", func() {
 	var context main.Context
-	context.Config = main.Load()
+	context.Config = main.Load("")
 	inputs, _ := main.ParseInputsOutput(context.Config)
 	stop := make(chan bool)
 	It("Weave to spin on a channel", func() {
@@ -46,7 +46,7 @@ var _ = Describe("Weave", func() {
 
 var _ = Describe("Main exits", func() {
 	var context main.Context
-	context.Config = main.Load()
+	context.Config = main.Load("")
 	It("Should eventually exit", func() {
 		stop := make(chan bool, 1)
 		stop <- true

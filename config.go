@@ -16,9 +16,10 @@ type Config struct {
 	PidFile   string
 }
 
-func Load() *Config {
+func Load(path string) *Config {
 	viper.SetConfigName("loom")
 
+	viper.AddConfigPath(path)
 	viper.AddConfigPath("/etc/")
 	viper.AddConfigPath("./etc")
 

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -68,8 +70,11 @@ func SignalSafeMain(osStop chan bool, context Context) {
 }
 
 func main() {
+	pathPtr := flag.String("c", "", "config path")
+	flag.Parse()
+	confPath := strings.Replace(*pathPtr, "loom.yml", "", 1)
 	var context Context
-	context.Config = Load()
+	context.Config = Load(confPath)
 	pidFile := ParsePidFile(context.Config)
 	osStop := make(chan os.Signal, 1)
 	closing := make(chan bool, 1)

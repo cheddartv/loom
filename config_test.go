@@ -11,7 +11,7 @@ var _ = Describe("loading configuration file", func() {
 	var c *main.Config
 
 	BeforeEach(func() {
-		c = main.Load()
+		c = main.Load("")
 	})
 
 	It("creates the correct number of manifests", func() {

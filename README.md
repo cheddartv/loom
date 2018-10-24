@@ -54,6 +54,9 @@ sudo /etc/init.d/loom restart
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6332540,CODECS="avc1.4d401f,mp4a.40.5",RESOLUTION=1280x720
 ../example/backup/2.m3u8
 ```
+## Optional Commandline Flags
+`-c=<string_path>`
+This allows you to manually override the default config location for testing / development.
 
 ### Prerequisites
 
