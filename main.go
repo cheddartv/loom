@@ -60,8 +60,6 @@ func SignalSafeMain(osStop chan bool, context Context) {
 
 	inputs, outputs := ParseInputsOutput(context.Config)
 	stopChannel := make(chan bool)
-	log.Print(inputs)
-	log.Print("we are spinning up worker groups")
 	for i, out := range outputs {
 		wg.Add(1)
 		go Weave(inputs[i], out, stopChannel)
@@ -73,7 +71,6 @@ func SignalSafeMain(osStop chan bool, context Context) {
 func main() {
 	pathPtr := flag.String("configPath", "", "config path")
 	flag.Parse()
-	log.Print("path has been set to ", *pathPtr)
 	confPath := strings.Replace(*pathPtr, "loom.yml", "", 1)
 	var context Context
 	context.Config = Load(confPath)
