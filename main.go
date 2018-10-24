@@ -70,7 +70,7 @@ func SignalSafeMain(osStop chan bool, context Context) {
 }
 
 func main() {
-	pathPtr := flag.String("configPath", "", "config path")
+	pathPtr := flag.String("c", "", "config path")
 	flag.Parse()
 	confPath := strings.Replace(*pathPtr, "loom.yml", "", 1)
 	var context Context

@@ -55,7 +55,7 @@ sudo /etc/init.d/loom restart
 ../example/backup/2.m3u8
 ```
 ## Optional Commandline Flags
-`-configPath=<string_path>`
+`-c=<string_path>`
 This allows you to manually override the default config location for testing / development.
 
 ### Prerequisites
