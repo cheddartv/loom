@@ -20,7 +20,7 @@ func ImportPlaylist(file string) (*m3u8.MasterPlaylist, error) {
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
-		log.Printf("Provided file %s errored and was skipped", file)
+		log.Printf("Provided file %s was skipped", file)
 		return nil, err
 	}
 	p, listType, err := m3u8.DecodeFrom(bufio.NewReader(f), true)
