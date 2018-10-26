@@ -22,7 +22,11 @@ func LongestExistingPath(dir string) string {
 		trimmedPath := strings.Join(splitPath[0:len(splitPath)-1], "/")
 		return LongestExistingPath(trimmedPath)
 	}
-	return dir
+	if dir == "" {
+		return "/"
+	} else {
+		return dir
+	}
 }
 
 func CleanPath(dirty string) string {
