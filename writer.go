@@ -93,6 +93,21 @@ func check(e error) {
 	}
 }
 
+func HttpPut(url string, manifest []byte) {
+	client := &http.Client{}
+	request, err := http.NewRequest("PUT", url, strings.NewReader(string(manifest)))
+	response, err := client.Do(request)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		defer response.Body.Close()
+		_, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func WriteManifest(manifests []ParsedInput, output string) {
 	variants := []variantWithPosition{}
 	variantToPath := make(map[*m3u8.Variant]string)
@@ -114,18 +129,7 @@ func WriteManifest(manifests []ParsedInput, output string) {
 
 	d1 := []byte(outputManifest.Encode().String())
 	if strings.HasPrefix(output, "http") {
-		client := &http.Client{}
-		request, err := http.NewRequest("PUT", output, strings.NewReader(string(d1)))
-		response, err := client.Do(request)
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			defer response.Body.Close()
-			_, err := ioutil.ReadAll(response.Body)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+		HttpPut(output, d1)
 	} else {
 		tmpfile, err := os.Create(output + ".tmp")
 		check(err)
