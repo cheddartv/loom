@@ -1,0 +1,10 @@
+pidfile: /var/run/loom.pid
+manifests:
+  - output: tmp/index.m3u8
+    inputs:
+      - example/primary/index.m3u8
+      - example/backup/index.m3u8
+  - output: https://s3.console.aws.amazon.com/s3/buckets/cheddar-development/loom-test/index.m3u8
+    inputs:
+      - example/primary/index2.m3u8
+      - example/backup/index2.m3u8

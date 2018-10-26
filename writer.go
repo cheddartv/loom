@@ -1,10 +1,13 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/grafov/m3u8"
 )
@@ -110,12 +113,27 @@ func WriteManifest(manifests []ParsedInput, output string) {
 	}
 
 	d1 := []byte(outputManifest.Encode().String())
-	tmpfile, err := os.Create(output + ".tmp")
-	check(err)
-	defer tmpfile.Close()
-	tmpfile.Write(d1)
-	tmpfile.Sync()
-	err = os.Rename(output+".tmp", output)
-	check(err)
+	if strings.HasPrefix(output, "http") {
+		client := &http.Client{}
+		request, err := http.NewRequest("PUT", output, strings.NewReader(string(d1)))
+		response, err := client.Do(request)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			defer response.Body.Close()
+			_, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	} else {
+		tmpfile, err := os.Create(output + ".tmp")
+		check(err)
+		defer tmpfile.Close()
+		tmpfile.Write(d1)
+		tmpfile.Sync()
+		err = os.Rename(output+".tmp", output)
+		check(err)
+	}
 
 }

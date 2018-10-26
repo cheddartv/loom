@@ -4,6 +4,7 @@ import (
 	"log"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/rjeczalik/notify"
 )
@@ -15,13 +16,17 @@ type Change struct {
 }
 
 func CleanPath(dirty string) string {
-	a, _ := filepath.Abs(dirty)
+	if strings.HasPrefix(dirty, "http") {
+		return dirty
+	} else {
+		a, _ := filepath.Abs(dirty)
+		d, err := filepath.EvalSymlinks(path.Dir(a))
+		if err != nil {
+			panic("Unable to evaluate symlinks on " + path.Dir(a))
+		}
 
-	d, err := filepath.EvalSymlinks(path.Dir(a))
-	if err != nil {
-		panic("Unable to evaluate symlinks on " + path.Dir(a))
+		return path.Join(d, path.Base(a))
 	}
-	return path.Join(d, path.Base(a))
 }
 
 func EventToString(event notify.Event) string {
@@ -35,6 +40,7 @@ func EventToString(event notify.Event) string {
 	default:
 		return ""
 	}
+
 }
 
 func InitWatchers(paths []string, in chan notify.EventInfo) map[string]string {
