@@ -21,7 +21,7 @@ func FindStructIndexByPath(abspath string, cs []ParsedInput) int {
 func AddPlaylist(event Change, cs []ParsedInput) []ParsedInput {
 	mp, err := ImportPlaylist(event.AbsPath)
 	if err != nil {
-		log.Printf("an error occured parsing the playlist %v ; It has not be tracked", event.Path)
+		log.Printf("skipping parsing the playlist %v; File does not exist", event.Path)
 	} else {
 		cs = append(cs, ParsedInput{Path: event.Path, AbsPath: event.AbsPath, Include: true, Playlist: mp})
 	}

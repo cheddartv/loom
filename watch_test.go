@@ -23,13 +23,21 @@ func name() string {
 	return string(b)
 }
 
+var _ = Describe("longest existing path", func() {
+	real_path, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
+	long_path := real_path + "/along/the/fake/path/we/go.tar"
+	It("returns the longest real file path", func() {
+		Expect(main.LongestExistingPath(long_path)).To(Equal(real_path))
+	})
+})
+
 var _ = Describe("generating clean paths", func() {
 	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
 
 	It("panics if provided path does not exist", func() {
 		Expect(func() {
 			main.CleanPath(path.Join("tmp", name(), "index.m3u8"))
-		}).To(Panic())
+		}).ToNot(Panic())
 	})
 
 	It("absolutifies and unsymlinks the path(s) it's given", func() {
