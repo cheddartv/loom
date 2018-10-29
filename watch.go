@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -15,18 +16,34 @@ type Change struct {
 	Type    string
 }
 
-func CleanPath(dirty string) string {
-	if strings.HasPrefix(dirty, "http") {
-		return dirty
-	} else {
-		a, _ := filepath.Abs(dirty)
-		d, err := filepath.EvalSymlinks(path.Dir(a))
-		if err != nil {
-			panic("Unable to evaluate symlinks on " + path.Dir(a))
-		}
-
-		return path.Join(d, path.Base(a))
+func LongestExistingPath(dir string) string {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		splitPath := strings.Split(dir, "/")
+		trimmedPath := strings.Join(splitPath[0:len(splitPath)-1], "/")
+		return LongestExistingPath(trimmedPath)
 	}
+	if dir == "" {
+		return "/"
+	} else {
+		return dir
+	}
+}
+
+func CleanPath(dirty string) string {
+	return CleanPaths(dirty, "")
+}
+
+func CleanPaths(dirty string, suffix string) string {
+	a, _ := filepath.Abs(dirty)
+	d, err := filepath.EvalSymlinks(path.Dir(a))
+	if err != nil {
+		splitPath := strings.Split(dirty, "/")
+		trimmedPath := strings.Join(splitPath[0:len(splitPath)-2], "/") + "/" + splitPath[len(splitPath)-1]
+		suffix = splitPath[len(splitPath)-2] + "/" + suffix
+		return CleanPaths(trimmedPath, suffix)
+	}
+	d = d + "/" + suffix
+	return path.Join(d, path.Base(a))
 }
 
 func EventToString(event notify.Event) string {
@@ -47,7 +64,7 @@ func InitWatchers(paths []string, in chan notify.EventInfo) map[string]string {
 	pathsMap := make(map[string]string)
 	for _, p := range paths {
 		pathsMap[CleanPath(p)] = p
-		d := path.Dir(p)
+		d := LongestExistingPath(path.Dir(p))
 		if err := notify.Watch(d+"/...", in, notify.Create, notify.Remove, notify.Write); err != nil {
 			log.Fatal(err)
 		}
