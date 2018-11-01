@@ -108,6 +108,17 @@ func HttpPut(url string, manifest []byte) {
 	}
 }
 
+func WriteToDisk(path string, manifest []byte) {
+	tmpfile, err := os.Create(path + ".tmp")
+	check(err)
+
+	tmpfile.Write(manifest)
+	tmpfile.Sync()
+	tmpfile.Close()
+	err = os.Rename(path+".tmp", path)
+	check(err)
+}
+
 func WriteManifest(manifests []ParsedInput, output string) {
 	variants := []variantWithPosition{}
 	variantToPath := make(map[*m3u8.Variant]string)
@@ -131,13 +142,6 @@ func WriteManifest(manifests []ParsedInput, output string) {
 	if strings.HasPrefix(output, "http") {
 		HttpPut(output, d1)
 	} else {
-		tmpfile, err := os.Create(output + ".tmp")
-		check(err)
-		defer tmpfile.Close()
-		tmpfile.Write(d1)
-		tmpfile.Sync()
-		err = os.Rename(output+".tmp", output)
-		check(err)
+		WriteToDisk(output, d1)
 	}
-
 }

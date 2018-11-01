@@ -74,7 +74,7 @@ var _ = Describe("WriteManifest", func() {
 		{Path: "index.m3u8", AbsPath: workingDir + "/example/backup/index.m3u8", Include: true, Playlist: mp2},
 	}
 	It("Generates and output file", func() {
-		main.WriteManifest(manifests, main.CleanPath("tmp/index.m3u8"))
+		main.WriteManifest(manifests, main.CleanPath("tmp/index5.m3u8"))
 		Expect(output).Should(BeAnExistingFile())
 	})
 
