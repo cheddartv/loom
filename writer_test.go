@@ -65,7 +65,7 @@ var _ = Describe("HandleEvent", func() {
 })
 
 var _ = Describe("WriteManifest", func() {
-	output := "tmp/index.m3u8"
+	output := "tmp/index5.m3u8"
 	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
 	mp1, _ := main.ImportPlaylist(workingDir + "/example/primary/index.m3u8")
 	mp2, _ := main.ImportPlaylist(workingDir + "/example/backup/index.m3u8")
