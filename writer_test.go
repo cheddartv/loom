@@ -65,7 +65,7 @@ var _ = Describe("HandleEvent", func() {
 })
 
 var _ = Describe("WriteManifest", func() {
-	output := "tmp/index.m3u8"
+	output := "tmp/index5.m3u8"
 	workingDir, _ := filepath.EvalSymlinks(os.Getenv("PWD"))
 	mp1, _ := main.ImportPlaylist(workingDir + "/example/primary/index.m3u8")
 	mp2, _ := main.ImportPlaylist(workingDir + "/example/backup/index.m3u8")
@@ -74,7 +74,7 @@ var _ = Describe("WriteManifest", func() {
 		{Path: "index.m3u8", AbsPath: workingDir + "/example/backup/index.m3u8", Include: true, Playlist: mp2},
 	}
 	It("Generates and output file", func() {
-		main.WriteManifest(manifests, main.CleanPath("tmp/index.m3u8"))
+		main.WriteManifest(manifests, main.CleanPath("tmp/index5.m3u8"))
 		Expect(output).Should(BeAnExistingFile())
 	})
 

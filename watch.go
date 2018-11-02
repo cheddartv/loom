@@ -57,6 +57,7 @@ func EventToString(event notify.Event) string {
 	default:
 		return ""
 	}
+
 }
 
 func InitWatchers(paths []string, in chan notify.EventInfo) map[string]string {

@@ -1,10 +1,13 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/grafov/m3u8"
 )
@@ -90,6 +93,32 @@ func check(e error) {
 	}
 }
 
+func HttpPut(url string, manifest []byte) {
+	client := &http.Client{}
+	request, err := http.NewRequest("PUT", url, strings.NewReader(string(manifest)))
+	response, err := client.Do(request)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		defer response.Body.Close()
+		_, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func WriteToDisk(path string, manifest []byte) {
+	tmpfile, err := os.Create(path + ".tmp")
+	check(err)
+
+	tmpfile.Write(manifest)
+	tmpfile.Sync()
+	tmpfile.Close()
+	err = os.Rename(path+".tmp", path)
+	check(err)
+}
+
 func WriteManifest(manifests []ParsedInput, output string) {
 	variants := []variantWithPosition{}
 	variantToPath := make(map[*m3u8.Variant]string)
@@ -110,12 +139,9 @@ func WriteManifest(manifests []ParsedInput, output string) {
 	}
 
 	d1 := []byte(outputManifest.Encode().String())
-	tmpfile, err := os.Create(output + ".tmp")
-	check(err)
-	defer tmpfile.Close()
-	tmpfile.Write(d1)
-	tmpfile.Sync()
-	err = os.Rename(output+".tmp", output)
-	check(err)
-
+	if strings.HasPrefix(output, "http") {
+		HttpPut(output, d1)
+	} else {
+		WriteToDisk(output, d1)
+	}
 }
