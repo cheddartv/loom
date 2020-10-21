@@ -138,7 +138,9 @@ func WriteManifest(manifests []ParsedInput, output string) {
 		outputManifest.Append(rel+"/"+v.variant.URI, v.variant.Chunklist, v.variant.VariantParams)
 	}
 
-	d1 := []byte(outputManifest.Encode().String())
+	outputManifest.SetVersion(3)
+	manstr := outputManifest.Encode().String()
+	d1 := []byte(strings.Replace(manstr, "TYPE=CLOSED-CAPTIONS,", `TYPE=CLOSED-CAPTIONS,INSTREAM-ID="CC1",`, 1))
 	if strings.HasPrefix(output, "http") {
 		HttpPut(output, d1)
 	} else {
